@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-container">
+    <div class="auth-card">
+        <a href="index.html" class="auth-logo">
+            <span class="icon">✚</span>
+            <span>Med<span>Reminder</span></span>
+        </a>
+
+        <h2 class="auth-title">Welcome Back! 👋</h2>
+        <p class="auth-subtitle">Log in to track your doses and medicine reminders.</p>
+
+        <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+        <div id="successAlert" class="alert alert-success" style="display: none;"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="name@example.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn btn-primary btn-block" style="margin-top: 24px;">
+                <span>Login</span> ➔
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="register.html">Create an Account</a>
+            <div style="margin-top: 14px;">
+                <a href="index.html" style="color: var(--text-muted); font-size: 0.85rem;">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    // Redirect if already logged in
+    redirectIfLoggedIn();
+
+    const form = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorAlert = document.getElementById('errorAlert');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+            errorAlert.textContent = 'Please enter both email and password.';
+            errorAlert.style.display = 'flex';
+            return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = 'Logging in... ⏳';
+
+        try {
+            const data = await apiRequest('/auth/login', {
+                method: 'POST',
+                body: { email, password }
+            });
+
+            saveAuth(data.access_token, data.user);
+            showToast('Login successful! Welcome back.', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 600);
+        } catch (err) {
+            errorAlert.textContent = err.message || 'Incorrect email or password.';
+            errorAlert.style.display = 'flex';
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<span>Login</span> ➔';
+        }
+    });
+</script>
+
+</body>
+</html>

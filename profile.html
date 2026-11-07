@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <span class="icon">✚</span>
+                <span>MedReminder</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar js-user-avatar">U</div>
+            <div class="user-info">
+                <h4 class="js-user-name">Loading...</h4>
+                <p class="js-user-email">patient@example.com</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <span class="icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="add_medicine.html" class="nav-link">
+                <span class="icon">＋</span>
+                <span>Add Medicine</span>
+            </a>
+            <a href="medicine_list.html" class="nav-link">
+                <span class="icon">💊</span>
+                <span>Medicine List</span>
+            </a>
+            <a href="schedule.html" class="nav-link">
+                <span class="icon">▣</span>
+                <span>Schedule</span>
+            </a>
+            <a href="reminders.html" class="nav-link">
+                <span class="icon">⏰</span>
+                <span>Reminders</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </a>
+            <a href="profile.html" class="nav-link active">
+                <span class="icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="logout.html" class="nav-link" style="color: #fca5a5;">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2>Account & Patient Profile 👤</h2>
+            </div>
+            <div class="top-actions">
+                <a href="logout.html" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #fca5a5;">
+                    ↪ Logout Session
+                </a>
+            </div>
+        </header>
+
+        <main class="content-body" style="max-width: 860px;">
+            <!-- Profile Info Header Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-body" style="display: flex; align-items: center; gap: 24px;">
+                    <div class="user-avatar js-user-avatar" style="width: 72px; height: 72px; font-size: 2rem;">
+                        U
+                    </div>
+                    <div>
+                        <h2 class="js-user-name" style="font-size: 1.5rem; margin-bottom: 4px;">User</h2>
+                        <p class="js-user-email" style="color: var(--text-secondary); margin-bottom: 8px;">patient@example.com</p>
+                        <span class="badge badge-taken">Account Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Personal Info Form -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="card-title">Personal Information</div>
+                </div>
+                <div class="card-body">
+                    <div id="profileAlert" class="alert alert-success" style="display: none;"></div>
+
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label class="form-label" for="full_name">Full Name *</label>
+                            <input type="text" id="full_name" class="form-control" required minlength="2">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" disabled style="background: #f1f5f9; cursor: not-allowed;">
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">Email address cannot be changed.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="e.g. +1 555-0199">
+                        </div>
+
+                        <button type="submit" id="saveProfileBtn" class="btn btn-teal" style="margin-top: 10px;">
+                            Save Profile Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change Password Form -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Security & Password</div>
+                </div>
+                <div class="card-body">
+                    <div id="passwordAlert" class="alert alert-error" style="display: none;"></div>
+
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label class="form-label" for="old_password">Current Password *</label>
+                            <input type="password" id="old_password" class="form-control" required autocomplete="current-password">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="new_password">New Password *</label>
+                                <input type="password" id="new_password" class="form-control" required minlength="6" autocomplete="new-password">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="confirm_new_password">Confirm New Password *</label>
+                                <input type="password" id="confirm_new_password" class="form-control" required minlength="6" autocomplete="new-password">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="savePasswordBtn" class="btn btn-primary" style="margin-top: 10px;">
+                            Update Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    requireAuth();
+
+    async function loadProfile() {
+        try {
+            const user = await apiRequest('/auth/profile');
+            document.getElementById('full_name').value = user.full_name || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('phone').value = user.phone || '';
+
+            // Update stored user
+            saveAuth(getToken(), user);
+            setupAppShell();
+        } catch (err) {
+            console.error('Failed to load profile:', err);
+        }
+    }
+
+    // Save Profile Form
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const alertBox = document.getElementById('profileAlert');
+        alertBox.style.display = 'none';
+
+        const full_name = document.getElementById('full_name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        try {
+            const updated = await apiRequest('/auth/profile', {
+                method: 'PUT',
+                body: { full_name, phone }
+            });
+
+            saveAuth(getToken(), updated);
+            setupAppShell();
+
+            alertBox.className = 'alert alert-success';
+            alertBox.textContent = 'Profile updated successfully!';
+            alertBox.style.display = 'flex';
+            showToast('Profile updated!', 'success');
+        } catch (err) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = err.message || 'Failed to update profile.';
+            alertBox.style.display = 'flex';
+        }
+    });
+
+    // Change Password Form
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const alertBox = document.getElementById('passwordAlert');
+        alertBox.style.display = 'none';
+
+        const old_password = document.getElementById('old_password').value;
+        const new_password = document.getElementById('new_password').value;
+        const confirm_new = document.getElementById('confirm_new_password').value;
+
+        if (new_password !== confirm_new) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = 'New passwords do not match.';
+            alertBox.style.display = 'flex';
+            return;
+        }
+
+        try {
+            await apiRequest('/auth/change-password', {
+                method: 'PUT',
+                body: { old_password, new_password }
+            });
+
+            alertBox.className = 'alert alert-success';
+            alertBox.textContent = 'Password changed successfully!';
+            alertBox.style.display = 'flex';
+            showToast('Password changed successfully!', 'success');
+            document.getElementById('passwordForm').reset();
+        } catch (err) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = err.message || 'Failed to change password.';
+            alertBox.style.display = 'flex';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <span class="icon">✚</span>
+                <span>MedReminder</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar js-user-avatar">U</div>
+            <div class="user-info">
+                <h4 class="js-user-name">Loading...</h4>
+                <p class="js-user-email">patient@example.com</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <span class="icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="add_medicine.html" class="nav-link">
+                <span class="icon">＋</span>
+                <span>Add Medicine</span>
+            </a>
+            <a href="medicine_list.html" class="nav-link">
+                <span class="icon">💊</span>
+                <span>Medicine List</span>
+            </a>
+            <a href="schedule.html" class="nav-link">
+                <span class="icon">▣</span>
+                <span>Schedule</span>
+            </a>
+            <a href="reminders.html" class="nav-link">
+                <span class="icon">⏰</span>
+                <span>Reminders</span>
+            </a>
+            <a href="history.html" class="nav-link active">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span class="icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="logout.html" class="nav-link" style="color: #fca5a5;">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2>Medication History & Adherence 📊</h2>
+            </div>
+            <div class="top-actions">
+                <div class="date-pill js-current-date">📅 Today</div>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <!-- Filter Bar -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <label style="font-weight: 600; font-size: 0.9rem; color: var(--primary-navy);">Status:</label>
+                    <select id="filterStatus" class="form-control" style="width: auto; padding: 8px 14px;">
+                        <option value="">All Statuses</option>
+                        <option value="taken">Taken Only ✅</option>
+                        <option value="skipped">Skipped Only ⏭</option>
+                        <option value="missed">Missed Only ❌</option>
+                    </select>
+
+                    <label style="font-weight: 600; font-size: 0.9rem; color: var(--primary-navy); margin-left: 8px;">Date:</label>
+                    <input type="date" id="filterDate" class="form-control" style="width: auto; padding: 8px 12px;">
+                    <button onclick="clearFilters()" class="btn btn-outline btn-sm">Reset Filters</button>
+                </div>
+
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                    Total Records: <strong id="historyCount" style="color: var(--primary-navy);">0</strong>
+                </div>
+            </div>
+
+            <!-- History Table Card -->
+            <div class="card">
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Dosage</th>
+                                    <th>Scheduled Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Logged At</th>
+                                    <th>Notes</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                        Loading history records...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    requireAuth();
+
+    async function fetchHistory() {
+        const status = document.getElementById('filterStatus').value;
+        const date = document.getElementById('filterDate').value;
+
+        let queryParams = [];
+        if (status) queryParams.push(`status_filter=${status}`);
+        if (date) queryParams.push(`date_filter=${date}`);
+
+        const url = `/history/${queryParams.length ? '?' + queryParams.join('&') : ''}`;
+
+        try {
+            const records = await apiRequest(url);
+            renderHistoryTable(records);
+        } catch (err) {
+            console.error('Failed to fetch history:', err);
+            showToast('Unable to load history records.', 'error');
+        }
+    }
+
+    function renderHistoryTable(records) {
+        const tbody = document.getElementById('historyTableBody');
+        document.getElementById('historyCount').textContent = records.length;
+
+        if (records.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 48px 20px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">📋</div>
+                        <h4 style="font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 6px;">No history records found</h4>
+                        <p style="color: var(--text-secondary);">Your dose adherence records will appear here as you take or skip medications.</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        let html = '';
+        records.forEach(r => {
+            let statusBadge = '';
+            if (r.status === 'taken') {
+                statusBadge = '<span class="badge badge-taken">Taken ✅</span>';
+            } else if (r.status === 'skipped') {
+                statusBadge = '<span class="badge badge-skipped">Skipped ⏭</span>';
+            } else {
+                statusBadge = '<span class="badge badge-missed">Missed ❌</span>';
+            }
+
+            const actionTimeStr = r.action_time ? new Date(r.action_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
+
+            html += `
+                <tr>
+                    <td>
+                        <strong style="color: var(--primary-navy); font-size: 0.95rem;">${r.medicine_name}</strong>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">${r.medicine_type}</div>
+                    </td>
+                    <td><span style="font-weight: 600;">${r.dosage}</span></td>
+                    <td>
+                        <span style="font-weight: 600; color: var(--primary-navy);">${r.scheduled_date}</span>
+                        <div style="color: var(--accent-teal); font-size: 0.82rem; font-weight: 700;">${r.scheduled_time}</div>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${actionTimeStr}</span></td>
+                    <td><span style="font-size: 0.85rem; color: var(--text-muted);">${r.notes || '-'}</span></td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-outline btn-sm" onclick="deleteHistoryItem(${r.id})" title="Remove log record">
+                            🗑️ Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    async function deleteHistoryItem(id) {
+        if (!confirm('Are you sure you want to delete this log entry?')) return;
+
+        try {
+            await apiRequest(`/history/${id}`, { method: 'DELETE' });
+            showToast('History entry removed.', 'success');
+            fetchHistory();
+        } catch (err) {
+            showToast(err.message || 'Failed to delete record.', 'error');
+        }
+    }
+
+    function clearFilters() {
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterDate').value = '';
+        fetchHistory();
+    }
+
+    document.getElementById('filterStatus').addEventListener('change', fetchHistory);
+    document.getElementById('filterDate').addEventListener('change', fetchHistory);
+
+    document.addEventListener('DOMContentLoaded', fetchHistory);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <span class="icon">✚</span>
+                <span>MedReminder</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar js-user-avatar">U</div>
+            <div class="user-info">
+                <h4 class="js-user-name">Loading...</h4>
+                <p class="js-user-email">patient@example.com</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link active">
+                <span class="icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="add_medicine.html" class="nav-link">
+                <span class="icon">＋</span>
+                <span>Add Medicine</span>
+            </a>
+            <a href="medicine_list.html" class="nav-link">
+                <span class="icon">💊</span>
+                <span>Medicine List</span>
+            </a>
+            <a href="schedule.html" class="nav-link">
+                <span class="icon">▣</span>
+                <span>Schedule</span>
+            </a>
+            <a href="reminders.html" class="nav-link">
+                <span class="icon">⏰</span>
+                <span>Reminders</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span class="icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="logout.html" class="nav-link" style="color: #fca5a5;">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2>Health Dashboard</h2>
+            </div>
+            <div class="top-actions">
+                <div class="date-pill js-current-date">📅 Today</div>
+                <a href="add_medicine.html" class="btn btn-teal btn-sm">＋ Add Medicine</a>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <!-- Welcome Header -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 26px 30px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);">
+                <div>
+                    <h1 style="font-size: 1.8rem; margin-bottom: 6px;">
+                        Welcome back, <span class="js-user-name text-teal">User</span>! 👋
+                    </h1>
+                    <p style="color: var(--text-secondary); font-size: 1rem;">
+                        Here is your medication summary and active reminders for today.
+                    </p>
+                </div>
+                <div id="progressCircle" style="text-align: right;">
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-green);" id="rateText">0%</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Adherence Rate</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon blue">💊</div>
+                    <div class="stat-data">
+                        <h3 id="statTotalMeds">0</h3>
+                        <p>Total Medicines</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">⏰</div>
+                    <div class="stat-data">
+                        <h3 id="statTodayMeds">0</h3>
+                        <p>Today's Doses</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-data">
+                        <h3 id="statCompleted">0</h3>
+                        <p>Completed Doses</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon amber">⏳</div>
+                    <div class="stat-data">
+                        <h3 id="statPending">0</h3>
+                        <p>Pending Doses</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Upcoming Reminders -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Today's Scheduled Medications</div>
+                    <a href="reminders.html" class="btn btn-outline btn-sm">View All Reminders →</a>
+                </div>
+                <div class="card-body">
+                    <div id="remindersContainer">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading today's schedule...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Links -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                <a href="add_medicine.html" style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); transition: var(--transition);">
+                    <div style="width: 44px; height: 44px; background: #e0f2fe; color: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">＋</div>
+                    <div>
+                        <strong style="display: block; color: var(--primary-navy);">Add New Medicine</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Set dosage, times & food instructions</span>
+                    </div>
+                </a>
+
+                <a href="schedule.html" style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); transition: var(--transition);">
+                    <div style="width: 44px; height: 44px; background: #fef3c7; color: #d97706; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">▣</div>
+                    <div>
+                        <strong style="display: block; color: var(--primary-navy);">View Daily Schedule</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Morning, afternoon & evening sections</span>
+                    </div>
+                </a>
+
+                <a href="history.html" style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); transition: var(--transition);">
+                    <div style="width: 44px; height: 44px; background: #ecfdf5; color: #059669; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">📊</div>
+                    <div>
+                        <strong style="display: block; color: var(--primary-navy);">Medication History</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Review taken and skipped records</span>
+                    </div>
+                </a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    requireAuth();
+
+    async function loadDashboard() {
+        try {
+            const stats = await apiRequest('/dashboard/stats');
+
+            document.getElementById('statTotalMeds').textContent = stats.total_medicines;
+            document.getElementById('statTodayMeds').textContent = stats.today_medicines;
+            document.getElementById('statCompleted').textContent = stats.completed_doses;
+            document.getElementById('statPending').textContent = stats.pending_doses;
+            document.getElementById('rateText').textContent = `${stats.completion_rate}%`;
+
+            renderReminders(stats.upcoming_reminders || []);
+        } catch (err) {
+            console.error('Failed to load dashboard:', err);
+            showToast('Unable to fetch dashboard statistics.', 'error');
+        }
+    }
+
+    function renderReminders(reminders) {
+        const container = document.getElementById('remindersContainer');
+        if (reminders.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
+                    <h3 style="font-size: 1.2rem; color: var(--primary-navy); margin-bottom: 6px;">No medicines scheduled for today!</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 18px;">Add your prescription medications to start receiving reminders.</p>
+                    <a href="add_medicine.html" class="btn btn-teal btn-sm">＋ Add Medicine Now</a>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+        reminders.forEach(item => {
+            let statusBadge = '';
+            let actionButtons = '';
+
+            if (item.status === 'taken') {
+                statusBadge = '<span class="badge badge-taken">Taken ✅</span>';
+                actionButtons = '<span style="color: var(--accent-green); font-size: 0.85rem; font-weight: 600;">Completed</span>';
+            } else if (item.status === 'skipped') {
+                statusBadge = '<span class="badge badge-skipped">Skipped ⏭</span>';
+                actionButtons = '<span style="color: var(--text-muted); font-size: 0.85rem;">Skipped</span>';
+            } else if (item.status === 'due') {
+                statusBadge = '<span class="badge badge-due">Due Now 🔔</span>';
+                actionButtons = `
+                    <button class="btn btn-success btn-sm" onclick="markAction(${item.medicine_id}, '${item.scheduled_time}', 'taken')">Take</button>
+                    <button class="btn btn-outline btn-sm" onclick="markAction(${item.medicine_id}, '${item.scheduled_time}', 'skipped')">Skip</button>
+                `;
+            } else {
+                statusBadge = '<span class="badge badge-upcoming">Upcoming 🕒</span>';
+                actionButtons = `
+                    <button class="btn btn-outline btn-sm" onclick="markAction(${item.medicine_id}, '${item.scheduled_time}', 'taken')">Take Early</button>
+                    <button class="btn btn-outline btn-sm" onclick="markAction(${item.medicine_id}, '${item.scheduled_time}', 'skipped')">Skip</button>
+                `;
+            }
+
+            const foodTag = item.before_after_food === 'before_food' ? 'Before Food' :
+                            item.before_after_food === 'after_food' ? 'After Food' :
+                            item.before_after_food === 'with_food' ? 'With Food' : 'No Food Preference';
+
+            html += `
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 44px; height: 44px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;">
+                            💊
+                        </div>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <strong style="font-size: 1.05rem; color: var(--primary-navy);">${item.medicine_name}</strong>
+                                <span class="badge-type">${item.medicine_type}</span>
+                                ${statusBadge}
+                            </div>
+                            <div style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 2px;">
+                                Dosage: <strong>${item.dosage}</strong> • ${foodTag} ${item.instructions ? `• <em>${item.instructions}</em>` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="text-align: right; margin-right: 8px;">
+                            <span style="display: block; font-weight: 700; color: var(--accent-teal); font-size: 1.05rem;">${item.display_time}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Scheduled</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            ${actionButtons}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    async function markAction(medicineId, scheduledTime, action) {
+        try {
+            const endpoint = action === 'taken' ? '/reminders/taken' : '/reminders/skipped';
+            await apiRequest(endpoint, {
+                method: 'POST',
+                body: { medicine_id: medicineId, scheduled_time: scheduledTime }
+            });
+            showToast(`Dose marked as ${action === 'taken' ? 'Taken ✅' : 'Skipped ⏭'}.`, 'success');
+            loadDashboard();
+        } catch (err) {
+            showToast(err.message || 'Action failed.', 'error');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+
+</body>
+</html>

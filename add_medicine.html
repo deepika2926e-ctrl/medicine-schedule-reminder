@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Medicine | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <span class="icon">✚</span>
+                <span>MedReminder</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar js-user-avatar">U</div>
+            <div class="user-info">
+                <h4 class="js-user-name">Loading...</h4>
+                <p class="js-user-email">patient@example.com</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <span class="icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="add_medicine.html" class="nav-link active">
+                <span class="icon">＋</span>
+                <span>Add Medicine</span>
+            </a>
+            <a href="medicine_list.html" class="nav-link">
+                <span class="icon">💊</span>
+                <span>Medicine List</span>
+            </a>
+            <a href="schedule.html" class="nav-link">
+                <span class="icon">▣</span>
+                <span>Schedule</span>
+            </a>
+            <a href="reminders.html" class="nav-link">
+                <span class="icon">⏰</span>
+                <span>Reminders</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span class="icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="logout.html" class="nav-link" style="color: #fca5a5;">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2>Add Prescription Medicine 💊</h2>
+            </div>
+            <div class="top-actions">
+                <div class="date-pill js-current-date">📅 Today</div>
+                <a href="medicine_list.html" class="btn btn-outline btn-sm">View All Medicines</a>
+            </div>
+        </header>
+
+        <main class="content-body" style="max-width: 860px;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Medication Information & Timing</div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">* Required fields</span>
+                </div>
+                <div class="card-body">
+                    <div id="alertBox" class="alert alert-error" style="display: none;"></div>
+
+                    <form id="medicineForm">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label class="form-label" for="med_name">Medicine Name *</label>
+                                <input type="text" id="med_name" class="form-control" placeholder="e.g. Paracetamol, Metformin" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="med_dosage">Dosage *</label>
+                                <input type="text" id="med_dosage" class="form-control" placeholder="e.g. 500mg, 1 tablet, 10ml" required>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label class="form-label" for="med_type">Medicine Form / Type *</label>
+                                <select id="med_type" class="form-control" required>
+                                    <option value="Tablet" selected>Tablet</option>
+                                    <option value="Capsule">Capsule</option>
+                                    <option value="Syrup">Syrup (Liquid)</option>
+                                    <option value="Injection">Injection</option>
+                                    <option value="Drops">Eye/Ear Drops</option>
+                                    <option value="Inhaler">Inhaler</option>
+                                    <option value="Ointment">Cream / Ointment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="med_frequency">Frequency *</label>
+                                <select id="med_frequency" class="form-control" required>
+                                    <option value="Once Daily" selected>Once Daily</option>
+                                    <option value="Twice Daily">Twice Daily (Morning & Night)</option>
+                                    <option value="Three Times Daily">Three Times Daily (Morning, Afternoon & Night)</option>
+                                    <option value="As Needed">As Needed / SOS</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label class="form-label" for="reminder_time">Primary Reminder Time *</label>
+                                <input type="time" id="reminder_time" class="form-control" required value="08:00">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="start_date">Start Date *</label>
+                                <input type="date" id="start_date" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="end_date">End Date (Optional)</label>
+                                <input type="date" id="end_date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="before_after_food">Meal Association *</label>
+                            <select id="before_after_food" class="form-control" required>
+                                <option value="after_food" selected>After Food (Recommended for most tablets)</option>
+                                <option value="before_food">Before Food (Empty Stomach)</option>
+                                <option value="with_food">With Food (During Meal)</option>
+                                <option value="no_matter">No Food Preference</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="instructions">Doctor or Pharmacist Instructions</label>
+                            <textarea id="instructions" class="form-control" rows="3" placeholder="e.g. Take with a full glass of water, do not crush tablet, avoid dairy products."></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 14px; margin-top: 30px;">
+                            <button type="submit" id="submitBtn" class="btn btn-teal" style="padding: 12px 30px;">
+                                <span>＋ Save Medicine & Set Reminders</span>
+                            </button>
+                            <a href="dashboard.html" class="btn btn-outline" style="padding: 12px 24px;">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    requireAuth();
+
+    // Set today as default start date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').value = today;
+
+    const form = document.getElementById('medicineForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertBox = document.getElementById('alertBox');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.style.display = 'none';
+
+        const name = document.getElementById('med_name').value.trim();
+        const dosage = document.getElementById('med_dosage').value.trim();
+        const medicine_type = document.getElementById('med_type').value;
+        const frequency = document.getElementById('med_frequency').value;
+        const reminder_time = document.getElementById('reminder_time').value;
+        const start_date = document.getElementById('start_date').value;
+        const end_date = document.getElementById('end_date').value || null;
+        const before_after_food = document.getElementById('before_after_food').value;
+        const instructions = document.getElementById('instructions').value.trim() || null;
+
+        if (end_date && end_date < start_date) {
+            alertBox.textContent = 'End date cannot be earlier than start date.';
+            alertBox.style.display = 'flex';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Saving to Database... ⏳';
+
+        try {
+            const result = await apiRequest('/medicines/', {
+                method: 'POST',
+                body: {
+                    name,
+                    dosage,
+                    medicine_type,
+                    frequency,
+                    reminder_time,
+                    start_date,
+                    end_date,
+                    before_after_food,
+                    instructions
+                }
+            });
+
+            showToast(`${result.name} added successfully!`, 'success');
+            setTimeout(() => {
+                window.location.href = 'medicine_list.html';
+            }, 600);
+        } catch (err) {
+            alertBox.textContent = err.message || 'Failed to save medicine.';
+            alertBox.style.display = 'flex';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>＋ Save Medicine & Set Reminders</span>';
+        }
+    });
+</script>
+
+</body>
+</html>

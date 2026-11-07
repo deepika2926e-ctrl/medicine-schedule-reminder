@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminders | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .reminder-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 22px 26px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .reminder-card.due {
+            border-left: 6px solid var(--accent-amber);
+            background: #fffdf5;
+        }
+        .reminder-card.upcoming {
+            border-left: 6px solid var(--accent-teal);
+        }
+        .reminder-card.taken {
+            border-left: 6px solid var(--accent-green);
+            opacity: 0.85;
+        }
+        .reminder-card.skipped {
+            border-left: 6px solid var(--text-muted);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <span class="icon">✚</span>
+                <span>MedReminder</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar js-user-avatar">U</div>
+            <div class="user-info">
+                <h4 class="js-user-name">Loading...</h4>
+                <p class="js-user-email">patient@example.com</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <span class="icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="add_medicine.html" class="nav-link">
+                <span class="icon">＋</span>
+                <span>Add Medicine</span>
+            </a>
+            <a href="medicine_list.html" class="nav-link">
+                <span class="icon">💊</span>
+                <span>Medicine List</span>
+            </a>
+            <a href="schedule.html" class="nav-link">
+                <span class="icon">▣</span>
+                <span>Schedule</span>
+            </a>
+            <a href="reminders.html" class="nav-link active">
+                <span class="icon">⏰</span>
+                <span>Reminders</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span class="icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="logout.html" class="nav-link" style="color: #fca5a5;">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2>Medicine Reminders & Alerts ⏰</h2>
+            </div>
+            <div class="top-actions">
+                <button id="btnNotifEnable" class="btn btn-outline btn-sm" onclick="enableNotifications()">
+                    🔔 Enable Desktop Alerts
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="testSoundAlert()">
+                    🔊 Test Sound Chime
+                </button>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <!-- Alert Banner -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: var(--shadow-sm);">
+                <div>
+                    <h3 style="font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 4px;">Live Reminder Engine</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        This page automatically tracks your scheduled medications and sounds an audio chime when it is time to take your dose.
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; animation: pulse 1.5s infinite;"></span>
+                    <span style="font-size: 0.85rem; font-weight: 600; color: #047857;">Live Monitoring Active</span>
+                </div>
+            </div>
+
+            <!-- Due Now Section -->
+            <div style="margin-bottom: 30px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <h3 style="font-size: 1.2rem; color: var(--primary-navy);">🔔 Due Now / Action Required</h3>
+                    <span id="dueCountBadge" class="badge badge-due">0 Due</span>
+                </div>
+                <div id="dueContainer" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="background: white; border-radius: var(--radius-md); padding: 24px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-color);">
+                        No medicines currently overdue or due at this exact moment. Great job!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Today Section -->
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <h3 style="font-size: 1.2rem; color: var(--primary-navy);">🕒 Upcoming Today</h3>
+                    <span id="upcomingCountBadge" class="badge badge-upcoming">0 Upcoming</span>
+                </div>
+                <div id="upcomingContainer" style="display: flex; flex-direction: column; gap: 12px;">
+                    <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading today's reminders...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    requireAuth();
+
+    let notifiedSet = new Set();
+
+    async function loadReminders() {
+        try {
+            const reminders = await apiRequest('/reminders/upcoming');
+            renderRemindersList(reminders);
+            checkAndTriggerAlerts(reminders);
+        } catch (err) {
+            console.error('Failed to load reminders:', err);
+        }
+    }
+
+    function renderRemindersList(reminders) {
+        const dueContainer = document.getElementById('dueContainer');
+        const upcomingContainer = document.getElementById('upcomingContainer');
+
+        const dueItems = reminders.filter(r => r.status === 'due');
+        const upcomingItems = reminders.filter(r => r.status === 'upcoming');
+        const completedItems = reminders.filter(r => r.status === 'taken' || r.status === 'skipped');
+
+        document.getElementById('dueCountBadge').textContent = `${dueItems.length} Due`;
+        document.getElementById('upcomingCountBadge').textContent = `${upcomingItems.length} Upcoming`;
+
+        // Render Due
+        if (dueItems.length === 0) {
+            dueContainer.innerHTML = `
+                <div style="background: white; border-radius: var(--radius-md); padding: 24px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-color);">
+                    ✨ All caught up! No doses are pending or overdue right now.
+                </div>
+            `;
+        } else {
+            let dueHtml = '';
+            dueItems.forEach(item => {
+                dueHtml += buildReminderCardHtml(item, 'due');
+            });
+            dueContainer.innerHTML = dueHtml;
+        }
+
+        // Render Upcoming
+        if (upcomingItems.length === 0 && completedItems.length === 0) {
+            upcomingContainer.innerHTML = `
+                <div style="background: white; border-radius: var(--radius-md); padding: 30px; text-align: center; color: var(--text-muted);">
+                    No other medicines scheduled for today.
+                </div>
+            `;
+        } else {
+            let upHtml = '';
+            upcomingItems.forEach(item => {
+                upHtml += buildReminderCardHtml(item, 'upcoming');
+            });
+
+            if (completedItems.length > 0) {
+                upHtml += '<div style="margin-top: 20px; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem;">Completed Today:</div>';
+                completedItems.forEach(item => {
+                    upHtml += buildReminderCardHtml(item, item.status);
+                });
+            }
+            upcomingContainer.innerHTML = upHtml;
+        }
+    }
+
+    function buildReminderCardHtml(item, state) {
+        let badgeHtml = '';
+        let buttonsHtml = '';
+
+        if (state === 'due') {
+            badgeHtml = '<span class="badge badge-due">Due Now 🔔</span>';
+            buttonsHtml = `
+                <button class="btn btn-success btn-sm" onclick="handleDoseAction(${item.medicine_id}, '${item.scheduled_time}', 'taken')">Mark as Taken</button>
+                <button class="btn btn-outline btn-sm" onclick="handleDoseAction(${item.medicine_id}, '${item.scheduled_time}', 'skipped')">Skip Dose</button>
+            `;
+        } else if (state === 'upcoming') {
+            badgeHtml = '<span class="badge badge-upcoming">Scheduled 🕒</span>';
+            buttonsHtml = `
+                <button class="btn btn-outline btn-sm" onclick="handleDoseAction(${item.medicine_id}, '${item.scheduled_time}', 'taken')">Take Early</button>
+                <button class="btn btn-outline btn-sm" onclick="handleDoseAction(${item.medicine_id}, '${item.scheduled_time}', 'skipped')">Skip</button>
+            `;
+        } else if (state === 'taken') {
+            badgeHtml = '<span class="badge badge-taken">Taken ✅</span>';
+            buttonsHtml = '<span style="color: var(--accent-green); font-size: 0.85rem; font-weight: 600;">Dose Taken</span>';
+        } else {
+            badgeHtml = '<span class="badge badge-skipped">Skipped ⏭</span>';
+            buttonsHtml = '<span style="color: var(--text-muted); font-size: 0.85rem;">Dose Skipped</span>';
+        }
+
+        const foodTag = item.before_after_food === 'before_food' ? 'Before Food (Empty Stomach)' :
+                        item.before_after_food === 'after_food' ? 'After Food' :
+                        item.before_after_food === 'with_food' ? 'With Meal' : 'No Food Preference';
+
+        return `
+            <div class="reminder-card ${state}">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                        💊
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <strong style="font-size: 1.15rem; color: var(--primary-navy);">${item.medicine_name}</strong>
+                            <span class="badge-type">${item.medicine_type}</span>
+                            ${badgeHtml}
+                        </div>
+                        <div style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 3px;">
+                            Dosage: <strong>${item.dosage}</strong> • ${foodTag}
+                        </div>
+                        ${item.instructions ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;"><em>${item.instructions}</em></div>` : ''}
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="text-align: right;">
+                        <span style="display: block; font-size: 1.25rem; font-weight: 800; color: var(--accent-teal);">${item.display_time}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Scheduled Time</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        ${buttonsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function handleDoseAction(medicineId, time, action) {
+        try {
+            const endpoint = action === 'taken' ? '/reminders/taken' : '/reminders/skipped';
+            await apiRequest(endpoint, {
+                method: 'POST',
+                body: { medicine_id: medicineId, scheduled_time: time }
+            });
+            showToast(`Medicine marked as ${action === 'taken' ? 'Taken ✅' : 'Skipped ⏭'}.`, 'success');
+            loadReminders();
+        } catch (err) {
+            showToast(err.message || 'Action failed.', 'error');
+        }
+    }
+
+    function checkAndTriggerAlerts(reminders) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dueNowItems = reminders.filter(r => r.status === 'due');
+
+        dueNowItems.forEach(item => {
+            const reminderKey = `${todayStr}_${item.medicine_id}_${item.scheduled_time}`;
+            if (!notifiedSet.has(reminderKey)) {
+                notifiedSet.add(reminderKey);
+
+                // Play Audio Chime
+                playReminderSound();
+
+                // Send Desktop Push Notification
+                sendDesktopNotification(
+                    `💊 Time for ${item.medicine_name}!`,
+                    `Dosage: ${item.dosage} (${item.display_time}). Take ${item.before_after_food.replace('_', ' ')}.`
+                );
+
+                showToast(`🔔 Reminder Due: It is time to take ${item.medicine_name} (${item.dosage})!`, 'info');
+            }
+        });
+    }
+
+    async function enableNotifications() {
+        const granted = await requestNotificationPermission();
+        if (granted) {
+            showToast('Desktop notifications enabled successfully!', 'success');
+            document.getElementById('btnNotifEnable').textContent = '✅ Notifications Active';
+            document.getElementById('btnNotifEnable').disabled = true;
+        }
+    }
+
+    function testSoundAlert() {
+        playReminderSound();
+        showToast('Playing medical alert chime 🔊', 'info');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadReminders();
+        // Poll every 15 seconds to check for newly due doses
+        setInterval(loadReminders, 15000);
+
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const notifBtn = document.getElementById('btnNotifEnable');
+            if (notifBtn) {
+                notifBtn.textContent = '✅ Notifications Active';
+                notifBtn.disabled = true;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

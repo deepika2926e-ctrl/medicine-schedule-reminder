@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Out | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-container">
+    <div class="auth-card" style="text-align: center;">
+        <div style="font-size: 3.5rem; margin-bottom: 16px;">👋</div>
+        <h2 class="auth-title">You Have Logged Out</h2>
+        <p class="auth-subtitle">Your session has been terminated safely. Thank you for using Medicine Schedule Reminder.</p>
+
+        <div style="margin: 30px 0;">
+            <a href="login.html" class="btn btn-primary btn-block">Return to Login Now</a>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Redirecting automatically in <span id="countdown">2</span> seconds...
+        </p>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    // Call logout endpoint and clear local storage credentials
+    (async function() {
+        try {
+            await apiRequest('/auth/logout', { method: 'POST' });
+        } catch (e) {
+            // Ignore if token already invalid
+        }
+        clearAuth();
+
+        let count = 2;
+        const countEl = document.getElementById('countdown');
+        const interval = setInterval(() => {
+            count--;
+            if (countEl) countEl.textContent = count;
+            if (count <= 0) {
+                clearInterval(interval);
+                window.location.href = 'login.html';
+            }
+        }, 1000);
+    })();
+</script>
+
+</body>
+</html>

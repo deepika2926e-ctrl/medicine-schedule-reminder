@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+<div class="auth-container">
+    <div class="auth-card">
+        <a href="index.html" class="auth-logo">
+            <span class="icon">✚</span>
+            <span>Med<span>Reminder</span></span>
+        </a>
+
+        <h2 class="auth-title">Create Account ✨</h2>
+        <p class="auth-subtitle">Start organizing and automating your daily medicine schedule.</p>
+
+        <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label class="form-label" for="full_name">Full Name *</label>
+                <input type="text" id="full_name" class="form-control" placeholder="e.g. Sarah Jenkins" required minlength="2" maxlength="100">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address *</label>
+                <input type="email" id="email" class="form-control" placeholder="name@example.com" required maxlength="150">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="phone">Phone Number (Optional)</label>
+                <input type="tel" id="phone" class="form-control" placeholder="e.g. +1 555-0199" maxlength="30">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password *</label>
+                <input type="password" id="password" class="form-control" placeholder="At least 6 characters" required minlength="6" maxlength="100">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirm_password">Confirm Password *</label>
+                <input type="password" id="confirm_password" class="form-control" placeholder="Re-enter password" required minlength="6" maxlength="100">
+            </div>
+
+            <button type="submit" id="regBtn" class="btn btn-primary btn-block" style="margin-top: 24px;">
+                <span>Create Free Account</span> ➔
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="login.html">Login here</a>
+            <div style="margin-top: 14px;">
+                <a href="index.html" style="color: var(--text-muted); font-size: 0.85rem;">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    redirectIfLoggedIn();
+
+    const form = document.getElementById('registerForm');
+    const regBtn = document.getElementById('regBtn');
+    const errorAlert = document.getElementById('errorAlert');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+
+        const full_name = document.getElementById('full_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const password = document.getElementById('password').value;
+        const confirm_password = document.getElementById('confirm_password').value;
+
+        if (password !== confirm_password) {
+            errorAlert.textContent = 'Passwords do not match. Please verify both fields.';
+            errorAlert.style.display = 'flex';
+            return;
+        }
+
+        if (password.length < 6) {
+            errorAlert.textContent = 'Password must be at least 6 characters long.';
+            errorAlert.style.display = 'flex';
+            return;
+        }
+
+        regBtn.disabled = true;
+        regBtn.innerHTML = 'Creating Account... ⏳';
+
+        try {
+            const data = await apiRequest('/auth/register', {
+                method: 'POST',
+                body: { full_name, email, phone, password }
+            });
+
+            saveAuth(data.access_token, data.user);
+            showToast('Account created successfully! Welcome.', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 600);
+        } catch (err) {
+            errorAlert.textContent = err.message || 'Registration failed. Email may already be in use.';
+            errorAlert.style.display = 'flex';
+            regBtn.disabled = false;
+            regBtn.innerHTML = '<span>Create Free Account</span> ➔';
+        }
+    });
+</script>
+
+</body>
+</html>

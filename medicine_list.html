@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine List | Medicine Schedule Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 42, 71, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-box {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            animation: modalFadeIn 0.25s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <span class="icon">✚</span>
+                <span>MedReminder</span>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar js-user-avatar">U</div>
+            <div class="user-info">
+                <h4 class="js-user-name">Loading...</h4>
+                <p class="js-user-email">patient@example.com</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <span class="icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="add_medicine.html" class="nav-link">
+                <span class="icon">＋</span>
+                <span>Add Medicine</span>
+            </a>
+            <a href="medicine_list.html" class="nav-link active">
+                <span class="icon">💊</span>
+                <span>Medicine List</span>
+            </a>
+            <a href="schedule.html" class="nav-link">
+                <span class="icon">▣</span>
+                <span>Schedule</span>
+            </a>
+            <a href="reminders.html" class="nav-link">
+                <span class="icon">⏰</span>
+                <span>Reminders</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </a>
+            <a href="profile.html" class="nav-link">
+                <span class="icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="logout.html" class="nav-link" style="color: #fca5a5;">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2>All Prescribed Medicines 💊</h2>
+            </div>
+            <div class="top-actions">
+                <a href="add_medicine.html" class="btn btn-teal btn-sm">＋ Add Medicine</a>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <!-- Search & Filter Controls -->
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: var(--shadow-sm);">
+                <div style="flex: 1; min-width: 260px; max-width: 440px; position: relative;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search medicines by name..." style="padding-left: 36px;">
+                    <span style="position: absolute; left: 12px; top: 12px; color: var(--text-muted);"></span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                    Total Active Medications: <strong id="totalCount" style="color: var(--primary-navy);">0</strong>
+                </div>
+            </div>
+
+            <!-- Medicines List / Table -->
+            <div class="card">
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Medicine Name</th>
+                                    <th>Dosage</th>
+                                    <th>Type</th>
+                                    <th>Time</th>
+                                    <th>Food Instruction</th>
+                                    <th>Duration</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicineTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                        Loading medicines...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Edit Medicine Modal -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.25rem;">Edit Prescription Medicine</h3>
+            <button onclick="closeEditModal()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-secondary);">&times;</button>
+        </div>
+        <form id="editForm" style="padding: 24px;">
+            <input type="hidden" id="edit_id">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label" for="edit_name">Medicine Name *</label>
+                    <input type="text" id="edit_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit_dosage">Dosage *</label>
+                    <input type="text" id="edit_dosage" class="form-control" required>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label" for="edit_type">Type</label>
+                    <select id="edit_type" class="form-control">
+                        <option value="Tablet">Tablet</option>
+                        <option value="Capsule">Capsule</option>
+                        <option value="Syrup">Syrup</option>
+                        <option value="Injection">Injection</option>
+                        <option value="Drops">Drops</option>
+                        <option value="Inhaler">Inhaler</option>
+                        <option value="Ointment">Ointment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit_time">Reminder Time *</label>
+                    <input type="time" id="edit_time" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="edit_food">Food Instruction</label>
+                <select id="edit_food" class="form-control">
+                    <option value="after_food">After Food</option>
+                    <option value="before_food">Before Food</option>
+                    <option value="with_food">With Food</option>
+                    <option value="no_matter">No Food Preference</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="edit_instructions">Instructions / Notes</label>
+                <textarea id="edit_instructions" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" onclick="closeEditModal()" class="btn btn-outline">Cancel</button>
+                <button type="submit" class="btn btn-teal">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+    requireAuth();
+
+    let allMedicines = [];
+
+    async function fetchMedicines(search = '') {
+        try {
+            const url = search ? `/medicines/?search=${encodeURIComponent(search)}` : '/medicines/';
+            const meds = await apiRequest(url);
+            allMedicines = meds;
+            renderMedicines(meds);
+        } catch (err) {
+            console.error('Failed to fetch medicines:', err);
+            showToast('Unable to load medicines.', 'error');
+        }
+    }
+
+    function renderMedicines(meds) {
+        const tbody = document.getElementById('medicineTableBody');
+        document.getElementById('totalCount').textContent = meds.length;
+
+        if (meds.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 48px 20px;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">💊</div>
+                        <h4 style="font-size: 1.15rem; color: var(--primary-navy); margin-bottom: 6px;">No medicines found</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">You haven't added any prescription medicines yet or no search results match.</p>
+                        <a href="add_medicine.html" class="btn btn-teal btn-sm">＋ Add Medicine Now</a>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        let html = '';
+        meds.forEach(m => {
+            const foodLabel = m.before_after_food === 'before_food' ? 'Before Food' :
+                              m.before_after_food === 'after_food' ? 'After Food' :
+                              m.before_after_food === 'with_food' ? 'With Food' : 'Anytime';
+
+            const duration = m.end_date ? `${m.start_date} to ${m.end_date}` : `From ${m.start_date} (Ongoing)`;
+
+            html += `
+                <tr>
+                    <td>
+                        <strong style="color: var(--primary-navy); font-size: 0.98rem;">${m.name}</strong>
+                        ${m.instructions ? `<div style="font-size: 0.78rem; color: var(--text-muted);">${m.instructions}</div>` : ''}
+                    </td>
+                    <td><span style="font-weight: 600;">${m.dosage}</span></td>
+                    <td><span class="badge-type">${m.medicine_type}</span></td>
+                    <td><span style="color: var(--accent-teal); font-weight: 700;">${m.reminder_time}</span></td>
+                    <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${foodLabel}</span></td>
+                    <td><span style="font-size: 0.82rem; color: var(--text-muted);">${duration}</span></td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-outline btn-sm" onclick="openEditModal(${m.id})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMed(${m.id}, '${m.name}')">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Search input live handler
+    let debounceTimer;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetchMedicines(e.target.value.trim());
+        }, 300);
+    });
+
+    // Delete medicine
+    async function deleteMed(id, name) {
+        if (!confirm(`Are you sure you want to delete "${name}"? This will also remove scheduled reminders.`)) {
+            return;
+        }
+
+        try {
+            await apiRequest(`/medicines/${id}`, { method: 'DELETE' });
+            showToast(`${name} deleted.`, 'success');
+            fetchMedicines(document.getElementById('searchInput').value.trim());
+        } catch (err) {
+            showToast(err.message || 'Failed to delete medicine.', 'error');
+        }
+    }
+
+    // Edit Modal Logic
+    function openEditModal(id) {
+        const med = allMedicines.find(m => m.id === id);
+        if (!med) return;
+
+        document.getElementById('edit_id').value = med.id;
+        document.getElementById('edit_name').value = med.name;
+        document.getElementById('edit_dosage').value = med.dosage;
+        document.getElementById('edit_type').value = med.medicine_type;
+        document.getElementById('edit_time').value = med.reminder_time;
+        document.getElementById('edit_food').value = med.before_after_food;
+        document.getElementById('edit_instructions').value = med.instructions || '';
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit_id').value;
+
+        const body = {
+            name: document.getElementById('edit_name').value.trim(),
+            dosage: document.getElementById('edit_dosage').value.trim(),
+            medicine_type: document.getElementById('edit_type').value,
+            reminder_time: document.getElementById('edit_time').value,
+            before_after_food: document.getElementById('edit_food').value,
+            instructions: document.getElementById('edit_instructions').value.trim() || null
+        };
+
+        try {
+            await apiRequest(`/medicines/${id}`, {
+                method: 'PUT',
+                body
+            });
+            showToast('Medicine updated successfully!', 'success');
+            closeEditModal();
+            fetchMedicines(document.getElementById('searchInput').value.trim());
+        } catch (err) {
+            showToast(err.message || 'Failed to update medicine.', 'error');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => fetchMedicines());
+</script>
+
+</body>
+</html>
